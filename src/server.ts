@@ -3,8 +3,10 @@ import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import { config } from "../config";
 import { AppDataSource } from "./database/dataSource";
+import auth from "./middlewares/auth"
+import { UserPrincipleRequest } from "./types/UserPrincipleRequest";
 
-const fastify = Fastify({logger: true})
+const fastify = Fastify({logger: false})
 
 //register plugin
 fastify.register(swagger)
@@ -15,9 +17,15 @@ fastify.register(swaggerUI, {
     },
     staticCSP: true,
 });
+
+//register middlewares
+fastify.addHook("preHandler", auth) //authentication
+
+
 //register route
 fastify.register(require("./routes/itemRoutes"))
 fastify.register(require("./routes/userRoutes"))
+fastify.register(require("./routes/authRoutes"))
 
 const start = async () => {
     try {
@@ -27,7 +35,7 @@ const start = async () => {
         await fastify.listen({port: config.port})
         console.log(`Server listening on port ${config.port}`);
     } catch (error) {
-        fastify.log.error(error)
+        console.error(error)
         process.exit(1)
     }
 }

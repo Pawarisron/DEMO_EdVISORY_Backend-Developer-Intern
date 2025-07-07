@@ -1,9 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { AppDataSource } from "../database/dataSource";
 import { User } from "../entities/user";
+import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
 
 //Get all users
-export const getUsers = async(req:FastifyRequest, reply:FastifyReply) => {
+export const getUsers = async(req:UserPrincipleRequest, reply:FastifyReply) => {
     try {
         const userRepo = AppDataSource.getRepository(User);
         const users = await userRepo.find();
