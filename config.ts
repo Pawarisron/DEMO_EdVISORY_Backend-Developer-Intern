@@ -5,7 +5,11 @@ export const config = {
     //Server
     port: parseInt(process.env.PORT || "3000"),
     secret: process.env.SECRET || '',
-    
+    allowedPageSize: (process.env.ALLOWED_PAGE_SIZE || '10,20,50,100')
+    .split(',')
+    .map(Number)
+    .filter(n => !isNaN(n)),
+
     //DB
     dbHost: process.env.DB_HOST || "localhost",
     dbPort: parseInt(process.env.DB_PORT || "5432"),
@@ -25,7 +29,7 @@ export const config = {
 }
 
 if(config.secret === ''){
-    console.error(".env SECRET is empty")
-    process.exit(1)
+    console.error(".env SECRET is empty");
+    process.exit(1);
 }
 

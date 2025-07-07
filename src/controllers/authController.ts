@@ -4,6 +4,8 @@ import crypto from "crypto";
 import { config } from "../../config";
 import { redis } from "../database/redis";
 import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
+import { User } from "../entities/user";
+import { AppDataSource } from "../database/dataSource";
 
 export const login = async(req:FastifyRequest, reply:FastifyReply)=>{
 
@@ -17,18 +19,30 @@ export const login = async(req:FastifyRequest, reply:FastifyReply)=>{
     const decoded = Buffer.from(credentialBase64, 'base64').toString('utf-8');
     const [username, password] = decoded.split(":");
 
-    //TODO for testing
-    if (username !== 'admin' || password !== '1234') {
-        return reply.status(401).send({ message: "Invalid credentials" });
-    }
-    const userId = "10602"
-    //END TEST
+    try {
+        //query
+        const userRepo = AppDataSource.getRepository(User);
+        const user = await userRepo.find({
+            where: {
+                username: username,
+                password_hash: password, 
+            },
+            select: ['id','username','password_hash'],  
+        })
+        //check username password
+        if (username !== user[0].username || password !== user[0].password_hash) {
+            return reply.status(401).send({ message: "Invalid credentials" });
+        }
+        //access token
+        const accessToken = await generateAccessToken(user[0].id)
+        return reply.status(200).send({
+            access_token: accessToken,
+            token_type: "x-paw-key",
+        });
 
-    const accessToken = await generateAccessToken(userId)
-    return reply.status(200).send({
-        access_token: accessToken,
-        token_type: "x-paw-key",
-    });
+    } catch (error) {
+        reply.code(401).send({ message: 'The Username or Password is incorrect' ,detail: error});
+    }
 }
 
 //Logout single id
@@ -43,7 +57,7 @@ export const logout = async(req:UserPrincipleRequest, reply:FastifyReply)=>{
     return reply.send({
         message: "logout sessions success",
         userID: req.user?.id,
-        sectionID: req.user?.sectionId
+        sectionID: req.user?.sectionId,
     }).status(200)
 }
 
@@ -66,7 +80,7 @@ export const logoutAll = async (req: UserPrincipleRequest, reply: FastifyReply) 
 
     return reply.code(200).send({
         message: "logout all sessions success",
-        userID: userId
+        userID: userId,
     });
 };
 
@@ -83,6 +97,6 @@ async function generateAccessToken( userId:string ): Promise<string> {
 
     //store in redis group by userID
     await redis.setex(`${userId}:${accessToken}`, config.redisTimeToLive, "1")
-    console.log("creted sectionID:", accessToken)
+    console.log("creted sectionID:", accessToken);
     return accessToken;
 }
