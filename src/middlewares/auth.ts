@@ -23,6 +23,7 @@ export default async function auth( req:UserPrincipleRequest, reply:FastifyReply
         const [userId] = (pawKey as string).split(".");
         req.user = {
             id: userId,
+            sectionId: pawKey as string,
         };
         return; 
     }else{

@@ -4,7 +4,7 @@ import { User } from "../entities/user";
 import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
 
 //Get all users
-export const getUsers = async(req:UserPrincipleRequest, reply:FastifyReply) => {
+export const getUsers = async(req:FastifyRequest, reply:FastifyReply) => {
     try {
         const userRepo = AppDataSource.getRepository(User);
         const users = await userRepo.find();

@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import crypto from "crypto";
 import { config } from "../../config";
 import { redis } from "../database/redis";
+import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
 
 export const login = async(req:FastifyRequest, reply:FastifyReply)=>{
 
@@ -30,13 +31,45 @@ export const login = async(req:FastifyRequest, reply:FastifyReply)=>{
     });
 }
 
-export const logout = async(req:FastifyRequest, reply:FastifyReply)=>{
-    throw new Error("Function not implemented.");
+//Logout single id
+export const logout = async(req:UserPrincipleRequest, reply:FastifyReply)=>{
+    const userId = req.user?.id;
+    const sectionId = req.user?.sectionId;
+    if (!userId || !sectionId) {
+        return reply.code(401).send({ message: "Unauthorized" });
+    }
+    //Clear section in redis
+    await redis.del(`${userId}:${sectionId}`);
+    return reply.send({
+        message: "logout sessions success",
+        userID: req.user?.id,
+        sectionID: req.user?.sectionId
+    }).status(200)
 }
 
-export const logoutAll = async(req:FastifyRequest, reply:FastifyReply)=>{
-    throw new Error("Function not implemented.");
-}
+//Logout all device
+export const logoutAll = async (req: UserPrincipleRequest, reply: FastifyReply) => {
+    const userId = req.user?.id;
+    if (!userId) {
+        return reply.code(401).send({ message: "Unauthorized" });
+    }
+
+    let cursor = '0';
+    do {
+        const [nextCursor, keys] = await redis.scan(cursor, "MATCH", `${userId}:*`, "COUNT", 100);
+        if (keys.length > 0) {
+            //clear in redis
+            await redis.del(...keys);
+        }
+        cursor = nextCursor;
+    } while (cursor !== '0');
+
+    return reply.code(200).send({
+        message: "logout all sessions success",
+        userID: userId
+    });
+};
+
 
 async function generateAccessToken( userId:string ): Promise<string> {
     //gen uuid
