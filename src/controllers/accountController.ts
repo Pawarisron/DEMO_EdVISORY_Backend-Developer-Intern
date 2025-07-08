@@ -12,7 +12,7 @@ import { deleteAccountByIdSchema } from "../schemas/accounts/deleteAccountByIdSc
 //Get all account by user id
 export const getAllAccountByUserId = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
     try{
-        const {error, value} = paginationSchema.validate(req.query)
+        const {error, value} = paginationSchema.validate(req.query || null)
         if(error){
             return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
         }
@@ -66,7 +66,7 @@ export const getAllAccountByUserId = async (req:UserPrincipleRequest, reply:Fast
 export const createAccountByUserId = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
     try{
         //validation
-        const {error, value} = createAccountByUserIdSchema.validate(req.body);
+        const {error, value} = createAccountByUserIdSchema.validate(req.body || null);
         if(error){
             return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
         }
@@ -102,7 +102,7 @@ export const createAccountByUserId = async (req:UserPrincipleRequest, reply:Fast
 //Delete account by account id
 export const deleteAccountById = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
     try{
-        const {error, value} = deleteAccountByIdSchema.validate(req.params);
+        const {error, value} = deleteAccountByIdSchema.validate(req.params || null);
         if(error){
             return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
         }

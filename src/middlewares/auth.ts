@@ -18,7 +18,7 @@ export default async function auth( req:UserPrincipleRequest, reply:FastifyReply
     //get x-paw-key from header
     const pawKey = req.headers["x-paw-key"];
 
-    if(pawKey && await verifyAcessToken(pawKey as string)){
+    if(pawKey && await verifyAccessToken(pawKey as string)){
         //create user principal
         const [userId] = (pawKey as string).split(".");
         req.user = {
@@ -31,7 +31,7 @@ export default async function auth( req:UserPrincipleRequest, reply:FastifyReply
     }
 }
 
-async function verifyAcessToken(accessToken:string): Promise<boolean>{
+async function verifyAccessToken(accessToken:string): Promise<boolean>{
     const [userId, uuid, signature] = accessToken.split(".");
     if (!userId || !uuid || !signature) return false;
 

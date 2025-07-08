@@ -4,7 +4,6 @@ import swaggerUI from '@fastify/swagger-ui'
 import { config } from "../config";
 import { AppDataSource } from "./database/dataSource";
 import auth from "./middlewares/auth"
-import { UserPrincipleRequest } from "./types/UserPrincipleRequest";
 
 const fastify = Fastify({logger: false})
 
@@ -25,6 +24,7 @@ fastify.addHook("preHandler", auth) //authentication
 fastify.register(require("./routes/authRoutes"))
 fastify.register(require("./routes/userRoutes")) //test
 fastify.register(require("./routes/accountRoutes"))
+fastify.register(require("./routes/categoryRoutes"))
 
 const start = async () => {
     try {
