@@ -1,8 +1,11 @@
+import { Transaction } from './../entities/Transaction';
 import { createTransactionByUserIdSchema } from './../schemas/transactions/createTransactionByUserIdSchema';
 import { FastifyReply } from "fastify"
 import { UserPrincipleRequest } from "../types/UserPrincipleRequest"
 import { AppDataSource } from '../database/dataSource';
-import { Transaction } from '../entities/Transaction';
+import { uploadTransactionSlipByIdSchema } from '../schemas/transactions/uploadTransactionSlipByIdSchema';
+import path from 'path';
+import fs from 'fs';
 const leoProfanity = require('leo-profanity');
 
 //Get all transaction filter
@@ -30,7 +33,6 @@ export const createTransactionByUserId = async (req:UserPrincipleRequest, reply:
         const categoryId = value.categoryId;
         const accountId = value.accountId;
         
-
         //Validate account and category belong to this user only
         const isValid = await AppDataSource
         .createQueryBuilder()
@@ -60,6 +62,56 @@ export const createTransactionByUserId = async (req:UserPrincipleRequest, reply:
         return reply.status(201).send({message: "transaction created",transaction:transaction})
 
     }catch(error){
+        req.log.error(error);
+        reply.code(500).send({ message: 'Internal Server Error', details: error });
+    }
+}
+
+export const uploadTransactionSlipById = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
+    try{
+        //Validation
+        const {error, value} = uploadTransactionSlipByIdSchema.validate(req.params || null);
+        if(error){
+            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+        }
+        const data = await req.file();
+        if (!data) return reply.status(400).send({ error: 'No file uploaded' });
+        //check file type
+        if (!data.mimetype.startsWith('image/')) {
+            return reply.status(400).send({ error: 'Only image files allowed' });
+        }
+        const userId = req.user?.id;
+        if(!userId){
+            return reply.code(401).send({ message: 'Unauthorized'});
+        }
+
+        //Repo
+        const transactionRepo = AppDataSource.getRepository(Transaction);
+        const transactionId = value.id;
+
+        const ext = path.extname(data.filename);
+        const newFileName = `${Date.now()}${ext}`;
+        
+        //update DB
+        const result = await transactionRepo.update({id: transactionId, user_id:userId} , {slip_path:newFileName})
+        if (result.affected === 0) {
+        return reply.status(404).send({
+            message: 'Transaction not found or not have permission',
+        });
+        }
+
+        //save file
+        const uploadDir = path.resolve(__dirname, '../../uploads');
+        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+        const saveTo = path.join(uploadDir, newFileName);
+
+        const writeStream = fs.createWriteStream(saveTo);
+        await data.file.pipe(writeStream);
+        
+        reply.send({message: 'Upload image success', id:transactionId ,filename: newFileName}).code(201);
+
+    }
+    catch(error){
         req.log.error(error);
         reply.code(500).send({ message: 'Internal Server Error', details: error });
     }

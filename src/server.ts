@@ -1,4 +1,5 @@
 import Fastify from "fastify"
+import multipart from '@fastify/multipart';
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
 import { config } from "../config";
@@ -8,6 +9,7 @@ import auth from "./middlewares/auth"
 const fastify = Fastify({logger: false})
 
 //register plugin
+fastify.register(multipart);
 fastify.register(swagger)
 fastify.register(swaggerUI, {
     routePrefix: config.swaggerPath,
