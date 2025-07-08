@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuid4 } from "uuid";
 import crypto from "crypto";
 import { config } from "../../config";
 import { redis } from "../database/redis";
@@ -20,17 +20,17 @@ export const login = async(req:FastifyRequest, reply:FastifyReply)=>{
     const [username, password] = decoded.split(":");
 
     try {
-        //query
+        //query user
         const userRepo = AppDataSource.getRepository(User);
         const user = await userRepo.find({
             where: {
                 username: username,
-                password_hash: password, 
+                passwordHash: password, 
             },
-            select: ['id','username','password_hash'],  
+            select: ['id','username','passwordHash'],  
         })
         //check username password
-        if (username !== user[0].username || password !== user[0].password_hash) {
+        if (username !== user[0].username || password !== user[0].passwordHash) {
             return reply.status(401).send({ message: "Invalid credentials" });
         }
         //access token
@@ -87,7 +87,7 @@ export const logoutAll = async (req: UserPrincipleRequest, reply: FastifyReply) 
 
 async function generateAccessToken( userId:string ): Promise<string> {
     //gen uuid
-    const uuid = uuidv4();
+    const uuid = uuid4();
     //sign signature
     const hmac = crypto.createHmac("sha256", config.secret);
     //hash uuid and userID
@@ -97,6 +97,6 @@ async function generateAccessToken( userId:string ): Promise<string> {
 
     //store in redis group by userID
     await redis.setex(`${userId}:${accessToken}`, config.redisTimeToLive, "1")
-    console.log("creted sectionID:", accessToken);
+    console.log("created sectionID:", accessToken);
     return accessToken;
 }

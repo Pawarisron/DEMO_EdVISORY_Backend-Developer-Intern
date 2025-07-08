@@ -21,7 +21,6 @@ fastify.register(swaggerUI, {
 //register middlewares
 fastify.addHook("preHandler", auth) //authentication
 
-
 //register route
 fastify.register(require("./routes/itemRoutes"))
 fastify.register(require("./routes/userRoutes"))
@@ -29,9 +28,7 @@ fastify.register(require("./routes/authRoutes"))
 
 const start = async () => {
     try {
-
         await AppDataSource.initialize();
-
         await fastify.listen({port: config.port})
         console.log(`Server listening on port ${config.port}`);
     } catch (error) {
