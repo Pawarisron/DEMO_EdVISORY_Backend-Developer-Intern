@@ -1,4 +1,4 @@
-import { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply} from "fastify";
 import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
 import { AppDataSource } from "../database/dataSource";
 import { Account } from "../entities/Account";

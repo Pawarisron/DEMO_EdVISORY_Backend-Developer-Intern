@@ -25,6 +25,7 @@ fastify.register(require("./routes/authRoutes"))
 fastify.register(require("./routes/userRoutes")) //test
 fastify.register(require("./routes/accountRoutes"))
 fastify.register(require("./routes/categoryRoutes"))
+fastify.register(require("./routes/transactionRoutes"))
 
 const start = async () => {
     try {

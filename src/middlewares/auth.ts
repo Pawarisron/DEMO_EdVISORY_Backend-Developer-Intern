@@ -44,10 +44,9 @@ async function verifyAccessToken(accessToken:string): Promise<boolean>{
 
     //Check section in redis is valid ?
     if(await redis.exists(`${userId}:${accessToken}`) && isSignatureValid ){
-        console.log("authorization:", isSignatureValid );
+        console.log("authorization:", isSignatureValid ,"useId:", userId);
         return true;
     }
-    
     return false
         
 }

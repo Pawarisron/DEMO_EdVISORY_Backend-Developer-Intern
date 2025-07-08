@@ -3,6 +3,7 @@ import { config } from './../../config';
 import { Account } from "../entities/Account";
 import { User } from "../entities/User";
 import { Category } from "../entities/Category";
+import { Transaction } from "../entities/Transaction";
 
 export const AppDataSource = new DataSource({
     type:"postgres",
@@ -14,5 +15,5 @@ export const AppDataSource = new DataSource({
     schema: config.dbSchema,
     synchronize: config.dbSync,
     logging: true,
-    entities: [User, Account, Category],
+    entities: [User, Account, Category , Transaction],
 })

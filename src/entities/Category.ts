@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
+import { Transaction } from "./Transaction";
 
 
 export type CategoryType = 'INCOME' | 'EXPENSE';
@@ -7,7 +8,7 @@ export type CategoryType = 'INCOME' | 'EXPENSE';
 @Entity({ name: 'categories' })
 export class Category {
   @PrimaryGeneratedColumn('uuid')
-  id: string | undefined;
+  id!: string;
 
   @Column({ type: 'uuid' })
   user_id: string | undefined;
@@ -17,11 +18,14 @@ export class Category {
   user: User | undefined;
 
   @Column({ type: 'varchar' })
-  name: string | undefined;
+  name!: string;
 
   @Column({ type: 'varchar'})
   type: CategoryType | undefined;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date | undefined;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.category)
+  transactions: Transaction[] | undefined;
 }

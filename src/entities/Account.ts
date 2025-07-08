@@ -1,10 +1,11 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
+import { Transaction } from "./Transaction";
 
 @Entity({ name: 'accounts' })
 export class Account {
   @PrimaryGeneratedColumn('uuid')
-  id: string | undefined;
+  id!: string;
 
   @Column({ type: 'uuid' })
   user_id: string | undefined;
@@ -14,8 +15,11 @@ export class Account {
   user: User | undefined;
 
   @Column({ type: 'varchar' })
-  name: string | undefined;
+  name!: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date | undefined;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.account)
+  transactions: Transaction[] | undefined;
 }

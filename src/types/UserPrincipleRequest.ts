@@ -7,7 +7,7 @@ export interface UserPrinciple {
   sectionId: string;
 }
 
-//For custom Fastify Request
+//extend custom Fastify Request
 export interface UserPrincipleRequest extends FastifyRequest {
   user?: UserPrinciple;
 }
