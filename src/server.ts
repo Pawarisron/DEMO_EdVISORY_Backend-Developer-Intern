@@ -22,9 +22,8 @@ fastify.register(swaggerUI, {
 fastify.addHook("preHandler", auth) //authentication
 
 //register route
-fastify.register(require("./routes/itemRoutes")) //test
-fastify.register(require("./routes/userRoutes")) //test
 fastify.register(require("./routes/authRoutes"))
+fastify.register(require("./routes/userRoutes")) //test
 fastify.register(require("./routes/accountRoutes"))
 
 const start = async () => {
