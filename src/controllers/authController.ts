@@ -4,7 +4,7 @@ import crypto from "crypto";
 import { config } from "../../config";
 import { redis } from "../database/redis";
 import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
-import { User } from "../entities/user";
+import { User } from "../entities/User";
 import { AppDataSource } from "../database/dataSource";
 
 export const login = async(req:FastifyRequest, reply:FastifyReply)=>{

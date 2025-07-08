@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { AppDataSource } from "../database/dataSource";
-import { User } from "../entities/user";
+import { User } from "../entities/User";
 import Joi from "joi";
 import { config } from "../../config";
 
@@ -22,7 +22,7 @@ export const getUsers = async (req: FastifyRequest, reply: FastifyReply) => {
     const page = parseInt((req.query as any).page) || 1;
     const size = parseInt((req.query as any).size) || config.allowedPageSize[0];
     
-    //check page limit
+    //check page size
     const pageSize = config.allowedPageSize.includes(size) ? size : config.allowedPageSize[0];
     const userRepo = AppDataSource.getRepository(User);
 

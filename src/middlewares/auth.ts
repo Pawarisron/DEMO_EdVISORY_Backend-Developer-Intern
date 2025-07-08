@@ -1,4 +1,4 @@
-import { User } from './../entities/user';
+import { User } from '../entities/User';
 import { UserPrincipleRequest, UserPrinciple } from '../types/UserPrincipleRequest';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify';
