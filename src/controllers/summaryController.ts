@@ -1,11 +1,12 @@
+import { Transaction } from './../entities/Transaction';
 import { FastifyReply } from "fastify";
 import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
 import { getSummaryByUserIdSchema } from "../schemas/summary/getSummaryByUserIdSchema";
 import { AppDataSource } from "../database/dataSource";
-import { Transaction } from "../entities/Transaction";
 import { config } from "../../config";
 import { getSummaryAllowanceByUserIdSchema } from "../schemas/summary/getSummaryAllowanceByUserIdSchema";
 import { differenceInCalendarDays } from 'date-fns';
+import ExcelJS from 'exceljs';
 
 //get summary 
 export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
@@ -20,6 +21,7 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
             return reply.code(401).send({ message: 'Unauthorized'});
         }
 
+        const format = value.format;
         const mode = value.mode;
         const date = new Date(value.date);
         const month = value.month;
@@ -33,6 +35,7 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
         .createQueryBuilder('t')
         .leftJoin('t.category', 'category')
         .leftJoin('t.account', 'account')
+        .leftJoin('t.user','user')
         .where('t.user_id = :userId', { userId });
         
         //Filter
@@ -67,6 +70,30 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
         const income = parseFloat(incomeResult?.total || '0');
         const expense = parseFloat(expenseResult?.total || '0');
 
+        //export
+        if(format && format == "excel"){
+            const transactions = await query.select([
+                't.id',
+                't.amount',
+                't.transaction_date',
+                'category.type',
+                'category.name',
+                'account.name',
+                'user.username',
+                't.note_cleaned'
+            ])
+            .getMany();
+            const buffer = await exportExcel(transactions, {
+                income: income,
+                expense: expense,
+                balance: income - expense,
+            })
+            return reply
+                .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                .header('Content-Disposition', 'attachment; filename=data.xlsx')
+                .send(buffer);
+        }
+
         // Pagination
         const page = value.page || 1;
         const size = config.allowedPageSize.includes(value.size) ? value.size : config.allowedPageSize[0];
@@ -77,16 +104,15 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
         .take(size)
         .select([
             't.id',
-            't.user_id',
             't.amount',
             't.transaction_date',
             'category.type',
             'category.name',
             'account.name',
+            'user.username',
             't.note_cleaned'
         ])
         .getManyAndCount();
-
         return {
             transaction: transactions,
             summary: {
@@ -133,11 +159,13 @@ export const getSummaryAllowanceByUserId = async (req:UserPrincipleRequest, repl
         const monthlyExpense = value.monthlyExpense;
         const accountId = value.accountId;
         const daysRemaining = differenceInCalendarDays(payday, today) + 1;
+        const format = value.format
         
         const query = AppDataSource.getRepository(Transaction)
         .createQueryBuilder('t')
         .leftJoin("t.category","category")
         .leftJoin("t.account","account")
+        .leftJoin('t.user','user')
         .where("t.user_id = :userId", { userId })
         
         if(accountId){
@@ -175,6 +203,32 @@ export const getSummaryAllowanceByUserId = async (req:UserPrincipleRequest, repl
         if(mode === "expect"){
             sum = income - monthlyExpense;
             availablePerDay = sum / daysRemaining
+        }
+
+        //export
+        if(format && format == "excel"){
+            const transactions = await query.select([
+                't.id',
+                't.amount',
+                't.transaction_date',
+                'category.type',
+                'category.name',
+                'account.name',
+                'user.username',
+                't.note_cleaned'
+            ])
+            .getMany();
+            const buffer = await exportExcel(transactions, {
+                income: income,
+                ...(mode === "expect" ? {monthlyExpenses:monthlyExpense}: {expense:expense}),
+                balance: sum,
+                daysRemaining: daysRemaining,
+                availablePerDay: availablePerDay,
+            })
+            return reply
+                .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                .header('Content-Disposition', 'attachment; filename=data.xlsx')
+                .send(buffer);
         }
 
         // Pagination
@@ -221,4 +275,59 @@ export const getSummaryAllowanceByUserId = async (req:UserPrincipleRequest, repl
         req.log.error(error);
         reply.code(500).send({ message: 'Internal Server Error', details: error });
     }
+}
+
+type Summary = {
+    income?:number;
+    expense?:number;
+    monthlyExpenses?:number;
+    balance?:number;
+    daysRemaining?:number;
+    availablePerDay?:number;
+}
+
+//Export excel
+async function exportExcel(rawData:Transaction[], summary:Summary){
+
+    //Map data
+    const data = rawData.map(row => ({
+        id: row.id,
+        username: row.user?.username,
+        accountName: row.account?.name,
+        categoryName: row.category?.name,
+        type: row.category?.type,
+        amount: row.amount,
+        date: row.transaction_date,
+        note: row.note_cleaned
+    }));
+
+    //create excel
+    const workbook = new ExcelJS.Workbook();
+    const summarySheet = workbook.addWorksheet('Summary')
+    const dataSheet = workbook.addWorksheet('Data');
+
+    //add summary data
+    summarySheet.addRow(['Summary']);
+    if (summary.income !== undefined) summarySheet.addRow(['Income', summary.income]);
+    if (summary.expense !== undefined) summarySheet.addRow(['Expense', summary.expense]);
+    if (summary.monthlyExpenses !== undefined) summarySheet.addRow(['Monthly Expense', summary.monthlyExpenses]);
+    if (summary.balance !== undefined) summarySheet.addRow(['Balance', summary.balance]);
+    if (summary.daysRemaining !== undefined) summarySheet.addRow(['Days Remaining', summary.daysRemaining]);
+    if (summary.availablePerDay !== undefined) summarySheet.addRow(['Available per Day', summary.availablePerDay]);
+
+    //create col
+    dataSheet.columns = [
+        { header: 'ID', key: 'id' },
+        { header: 'Username', key: 'username' },
+        { header: 'Account', key: 'accountName' },
+        { header: 'Category', key: 'categoryName' },
+        { header: 'Type', key:'type'},
+        { header: 'Amount', key: 'amount'},
+        { header: 'Date', key: 'date'},
+        { header: 'Note', key: 'note'},
+    ];
+    //add add data
+    dataSheet.addRows(data);
+    //return buffer
+    return await workbook.xlsx.writeBuffer();
 }

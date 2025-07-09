@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { getSummaryAllowanceByUserId, getSummaryByUserId } from "../controllers/summaryController";
+import { getSummaryAllowanceByUserId, getSummaryByUserId} from "../controllers/summaryController";
 
 
 const summaryRoutes = async(fastify:FastifyInstance) =>{

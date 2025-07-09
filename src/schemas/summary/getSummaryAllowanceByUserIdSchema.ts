@@ -11,4 +11,6 @@ export const getSummaryAllowanceByUserIdSchema = paginationSchema.keys({
         otherwise: Joi.forbidden(), 
     }),
     accountId: Joi.string().uuid().optional(),
+    //export
+    format: Joi.string().valid("excel").optional(),
 });

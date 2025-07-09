@@ -35,5 +35,7 @@ export const getSummaryByUserIdSchema = paginationSchema.keys({
     }),
     //accountId
     accountId: Joi.string().uuid().optional(),
+    //export
+    format: Joi.string().valid("excel").optional(),
 
 });
