@@ -9,6 +9,7 @@ import { getAllTransactionByUserIdSchema } from '../schemas/transactions/getAllT
 import path from 'path';
 import fs from 'fs';
 import { config } from '../../config';
+import { getTransactionByIdSchema } from '../schemas/transactions/getTransactionByIdSchema';
 const leoProfanity = require('leo-profanity'); //bad word filter
 
 //Get all transaction filter
@@ -18,7 +19,6 @@ export const getAllTransactionByUserId = async (req:UserPrincipleRequest, reply:
         if(error){
             return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
         }
-        console.log(value)
         const userId = req.user?.id;
         if(!userId){
             return reply.code(401).send({ message: 'Unauthorized'});
@@ -93,7 +93,39 @@ export const getAllTransactionByUserId = async (req:UserPrincipleRequest, reply:
 }
 //Get Single transaction
 export const getTransactionById = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
-    
+    try{
+        //validation
+        const {error, value} = getTransactionByIdSchema.validate(req.params || null);
+        if(error){
+            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+        }
+        //check userId
+        const userId = req.user?.id;
+        if(!userId){
+            return reply.code(401).send({ message: 'Unauthorized'});
+        }
+
+        //get single transaction
+        const transactionRepo = AppDataSource.getRepository(Transaction);
+        const transaction = await transactionRepo.findOne({where:{
+            id:value.id,
+            user_id:userId,
+        } });
+        if(!transaction){
+            return reply.status(403).send({ message: 'Unauthorized or not found' });
+        }
+        return reply.status(200).send({
+            status:"success",
+            data:transaction,
+        })  
+        
+    }
+    catch(error){
+        req.log.error(error);
+        reply.code(500).send({ message: 'Internal Server Error', details: error });
+    }
+
+
     
 }
 //Create Transaction
