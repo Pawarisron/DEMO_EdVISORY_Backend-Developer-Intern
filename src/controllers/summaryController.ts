@@ -3,6 +3,7 @@ import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
 import { getSummaryByUserIdSchema } from "../schemas/summary/getSummaryByUserIdSchema";
 import { AppDataSource } from "../database/dataSource";
 import { Transaction } from "../entities/Transaction";
+import { config } from "../../config";
 
 //get summary 
 export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
@@ -29,6 +30,7 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
         const query = AppDataSource.getRepository(Transaction)
         .createQueryBuilder('t')
         .leftJoin('t.category', 'category')
+        .leftJoin('t.account', 'account')
         .where('t.user_id = :userId', { userId });
         
         //Filter
@@ -48,13 +50,13 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
 
         if (accountId) query.andWhere('t.account_id = :accountId', { accountId });
 
-        // summary income
+        // sum income
         const incomeResult = await query.clone()
         .andWhere('category.type = :type', { type: 'INCOME' })
         .select('SUM(t.amount)', 'total')
         .getRawOne();
 
-        // summary outcome
+        // sum outcome
         const expenseResult = await query.clone()
         .andWhere('category.type = :type', { type: 'EXPENSE' })
         .select('SUM(t.amount)', 'total')
@@ -63,15 +65,42 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
         const income = parseFloat(incomeResult?.total || '0');
         const expense = parseFloat(expenseResult?.total || '0');
 
+        // Pagination
+        const page = value.page || 1;
+        const size = config.allowedPageSize.includes(value.size) ? value.size : config.allowedPageSize[0];
+        const skip = (page  - 1) * size;
+        const [transactions, total] = await query
+        .orderBy('t.transaction_date', 'DESC')
+        .skip(skip)
+        .take(size)
+        .select([
+            't.id',
+            't.user_id',
+            't.amount',
+            't.transaction_date',
+            'category.name',
+            'account.name',
+            't.note_cleaned'
+        ])
+        .getManyAndCount();
+
         return {
+            transaction: transactions,
             summary: {
                 Income: income,
                 Expense: expense,
                 Balance: income - expense,
             },
+            mode,
             range: {
                 from,
                 to,
+            },
+            pagination: {
+                total,
+                page,
+                size: size,
+                totalPages: Math.ceil(total / size),
             }
         };
 
@@ -85,8 +114,17 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
 //get summary allowance
 export const getSummaryAllowanceByUserId = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
     try{
-        reply.send("here");
-    }catch(error){
 
+
+
+
+
+
+    
+
+        
+    }catch(error){
+        req.log.error(error);
+        reply.code(500).send({ message: 'Internal Server Error', details: error });
     }
 }

@@ -1,6 +1,7 @@
 import Joi from "joi";
+import { paginationSchema } from "../paginationSchema";
 
-export const getSummaryByUserIdSchema = Joi.object({
+export const getSummaryByUserIdSchema = paginationSchema.keys({
     mode:Joi.string().valid('day','month','year','range').required(),
     //date
     date:Joi.when('mode',{
