@@ -16,5 +16,9 @@
   "logout_sessions_success":"ออกจากระบบสำเร็จ",
   "logout_all_sessions_success":"ออกจากระบบทุกอุปกรณ์เรียบร้อยแล้ว",
   "category_created":"สร้างประเภทการใช้จ่ายเรียบร้อยแล้ว",
-  "category_deleted_successfully": "ลบหมวดหมู่เรียบร้อยแล้ว"
+  "category_deleted_successfully": "ลบหมวดหมู่เรียบร้อยแล้ว",
+  "only_excel_files_are_allowed":"สามารถอัปโหลดได้เฉพาะไฟล์ .xlsx เท่านั้น",
+  "no_worksheet_found":"ไม่พบ Worksheet ในไฟล์",
+  "import_transaction_successfully":"นำเข้ารายการธุรกรรมสำเร็จ",
+  "error_parsing_row":"เกิดข้อผิดพลาดในการประมวลผลแถวข้อมูล "
 }

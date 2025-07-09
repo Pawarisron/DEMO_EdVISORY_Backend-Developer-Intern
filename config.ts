@@ -9,6 +9,7 @@ export const config = {
     .split(',')
     .map(Number)
     .filter(n => !isNaN(n)),
+    adminId: process.env.ADMIN_ID || '',
 
     //DB
     dbHost: process.env.DB_HOST || "localhost",

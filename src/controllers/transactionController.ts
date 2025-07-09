@@ -10,6 +10,7 @@ import path from 'path';
 import fs from 'fs';
 import { config } from '../../config';
 import { getTransactionByIdSchema } from '../schemas/transactions/getTransactionByIdSchema';
+import ExcelJS from 'exceljs';
 const leoProfanity = require('leo-profanity'); //bad word filter
 
 //Get all transaction filter
@@ -178,7 +179,7 @@ export const createTransactionByUserId = async (req:UserPrincipleRequest, reply:
         reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
 }
-//Upload Transaction slp
+//Upload Transaction slip
 export const uploadTransactionSlipById = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
     try{
         //Validation
@@ -224,6 +225,64 @@ export const uploadTransactionSlipById = async (req:UserPrincipleRequest, reply:
 
     }
     catch(error){
+        req.log.error(error);
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
+    }
+}
+//import transaction excel (ADMIN ONLY)
+export const importTransactionByUserId = async (req:UserPrincipleRequest, reply:FastifyReply) =>{
+    try{
+        //Validate
+        const file = await req.file();
+        if(!file){
+            return reply.code(400).send({ error: req.i18n.t("no_file_uploaded") });
+        }
+        if (!file.filename.endsWith('.xlsx') || file.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+         return reply.code(400).send({ error: req.i18n.t("only_excel_files_are_allowed") });
+        }
+        const userId = req.user?.id;
+        //check of admin id
+        if(!userId || userId != config.adminId){ 
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
+        }
+        //Load buffer
+        const buffer = await file.toBuffer();
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(buffer as any);
+        //Validate sheet
+        const worksheet = workbook.getWorksheet(1);
+        if (!worksheet) return reply.code(400).send({ error: req.i18n.t("no_worksheet_found") });
+        //Repo
+        const transactionRepo = AppDataSource.getRepository(Transaction);
+        const rowsToInsert: Transaction[] = [];
+
+        worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+        if (rowNumber === 1) return;
+             //Create Transaction
+            try {
+                const transaction = new Transaction();
+                transaction.user_id = row.getCell(1).value?.toString().trim() || '';
+                transaction.account_id = row.getCell(2).value?.toString().trim() || '';
+                transaction.category_id = row.getCell(3).value?.toString().trim() || '';
+                transaction.amount = Number(row.getCell(4).value);
+                transaction.transaction_date = new Date(row.getCell(5).value as string).toISOString();
+                transaction.note_cleaned = leoProfanity.clean(row.getCell(6).value?.toString().trim() || ''); //Filter Bad word 
+                rowsToInsert.push(transaction);  
+            } catch (rowErr) {
+                throw new Error(`${req.i18n.t("error_parsing_row")}${rowNumber}: ${(rowErr as Error).message}`);
+            }      
+        });
+        //save in repo
+        await transactionRepo.save(rowsToInsert);
+        return reply.send({
+            message: req.i18n.t("import_transaction_successfully"),
+            total: rowsToInsert.length
+        });
+    }
+    catch(error:any){
+        if (error.code === 'FST_INVALID_MULTIPART_CONTENT_TYPE') {
+            return reply.code(406).send({ error: req.i18n.t("no_file_uploaded") });
+        }
         req.log.error(error);
         reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }

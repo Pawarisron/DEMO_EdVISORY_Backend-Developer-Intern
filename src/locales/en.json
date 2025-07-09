@@ -16,5 +16,9 @@
   "logout_sessions_success":"Logout sessions success",
   "logout_all_sessions_success":"Logout all sessions success",
   "category_created":"Category created",
-  "category_deleted_successfully": "Category deleted successfully"
+  "category_deleted_successfully": "Category deleted successfully",
+  "only_excel_files_are_allowed":"Only .xlsx files are allowed",
+  "no_worksheet_found":"No worksheet found",
+  "import_transaction_successfully":"Imported transactions successfully",
+  "error_parsing_row":"Error parsing row "
 }

@@ -21,6 +21,7 @@ fastify.register(swaggerUI, {
     },
     staticCSP: true,
 });
+//Load multi language support message from .json in locales
 type Messages = Record<string, Record<string, string>>
 const loadMessages = (): Messages => {
     const localesDir = path.join(__dirname, 'locales')
@@ -38,7 +39,6 @@ fastify.register(i18n, {
   fallbackLocale: 'en',
   messages: loadMessages()
 });
-
 
 //register middlewares
 fastify.addHook("preHandler", auth) //authentication
@@ -60,8 +60,5 @@ const start = async () => {
         process.exit(1)
     }
 }
-
-
-
 start()
 
