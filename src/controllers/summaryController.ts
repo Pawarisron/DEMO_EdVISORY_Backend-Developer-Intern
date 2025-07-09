@@ -14,11 +14,11 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
         //validation
         const {error, value} = getSummaryByUserIdSchema.validate(req.query || null)
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
 
         const format = value.format;
@@ -38,7 +38,7 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
         .leftJoin('t.user','user')
         .where('t.user_id = :userId', { userId });
         
-        //Filter
+        //Filter by
         if (mode === 'day') {
             query.andWhere('t.transaction_date = :date', { date });
         
@@ -135,7 +135,7 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
 
     }catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
     
 }
@@ -146,11 +146,11 @@ export const getSummaryAllowanceByUserId = async (req:UserPrincipleRequest, repl
         //validation
         const {error, value} = getSummaryAllowanceByUserIdSchema.validate(req.query || null)
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
 
         const mode = value.mode; 
@@ -257,7 +257,6 @@ export const getSummaryAllowanceByUserId = async (req:UserPrincipleRequest, repl
                 income:income,
                 ...(mode === "expect" ? {monthlyExpenses:monthlyExpense}: {expense:expense}),
                 balance:sum,
-                // sumExpense:expense,
                 daysRemaining: daysRemaining,
                 availablePerDay: availablePerDay,
             },
@@ -273,7 +272,7 @@ export const getSummaryAllowanceByUserId = async (req:UserPrincipleRequest, repl
         });
     }catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
 }
 

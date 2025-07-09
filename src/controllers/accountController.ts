@@ -14,11 +14,11 @@ export const getAllAccountByUserId = async (req:UserPrincipleRequest, reply:Fast
     try{
         const {error, value} = paginationSchema.validate(req.query || null)
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
         //Repo
         const accountRepo = AppDataSource.getRepository(Account);
@@ -26,7 +26,7 @@ export const getAllAccountByUserId = async (req:UserPrincipleRequest, reply:Fast
         //Find User
         const user = await userRepo.findOneBy({ id: userId });
          if (!user) {
-            return reply.code(400).send({ message: 'User not found'});
+            return reply.code(400).send({ message: req.i18n.t("user_not_found")});
         }
         //get query
         const page = value.page || 1;
@@ -56,7 +56,7 @@ export const getAllAccountByUserId = async (req:UserPrincipleRequest, reply:Fast
 
     }catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
 
 }
@@ -68,11 +68,11 @@ export const createAccountByUserId = async (req:UserPrincipleRequest, reply:Fast
         //validation
         const {error, value} = createAccountByUserIdSchema.validate(req.body || null);
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
         //Repo
         const accountRepo = AppDataSource.getRepository(Account);
@@ -80,7 +80,7 @@ export const createAccountByUserId = async (req:UserPrincipleRequest, reply:Fast
         //Find User
         const user = await userRepo.findOneBy({ id: userId });
          if (!user) {
-            return reply.code(400).send({ message: 'User not found'});
+            return reply.code(400).send({ message: req.i18n.t("user_not_found")});
         }
         //create account
         const account = new Account();
@@ -89,12 +89,12 @@ export const createAccountByUserId = async (req:UserPrincipleRequest, reply:Fast
 
         //save in db
         await accountRepo.save(account);
-        return reply.status(201).send({message: "account created",account:account})
+        return reply.status(201).send({message: req.i18n.t("account_created"),account:account})
 
     }
     catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
     
 }
@@ -104,11 +104,11 @@ export const deleteAccountById = async (req:UserPrincipleRequest, reply:FastifyR
     try{
         const {error, value} = deleteAccountByIdSchema.validate(req.params || null);
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
         //Repo
         const accountRepo = AppDataSource.getRepository(Account);
@@ -123,14 +123,14 @@ export const deleteAccountById = async (req:UserPrincipleRequest, reply:FastifyR
             } 
         });
         if (!account) {
-            return reply.status(403).send({ message: 'Unauthorized or not found' });
+            return reply.status(403).send({ message: req.i18n.t("err_unauthorized_or_not_found") });
         }
         //delete account
         await accountRepo.remove(account);
-        return reply.status(200).send({ message: 'Account deleted successfully' ,id:accountId });
+        return reply.status(200).send({ message:  req.i18n.t("account_deleted_successfully") ,id:accountId });
     }
     catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
 }

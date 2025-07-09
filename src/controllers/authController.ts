@@ -12,7 +12,7 @@ export const login = async(req:FastifyRequest, reply:FastifyReply)=>{
     const basic = req.headers.authorization;
     //Check basic
     if (!basic || !basic.startsWith("Basic ")) {
-        return reply.status(401).send({ message: "Unauthorized" });
+        return reply.status(401).send({ message: req.i18n.t('err_unauthorized') });
     }
     //Decoding
     const credentialBase64 = basic.slice(6);
@@ -31,7 +31,7 @@ export const login = async(req:FastifyRequest, reply:FastifyReply)=>{
         })
         //check username password
         if (username !== user[0].username || password !== user[0].passwordHash) {
-            return reply.status(401).send({ message: "Invalid credentials" });
+            return reply.status(401).send({ message: req.i18n.t("invalid_credentials") });
         }
         //access token
         const accessToken = await generateAccessToken(user[0].id)
@@ -41,7 +41,7 @@ export const login = async(req:FastifyRequest, reply:FastifyReply)=>{
         });
 
     } catch (error) {
-        reply.code(401).send({ message: 'The Username or Password is incorrect' ,detail: error});
+        reply.code(401).send({ message: req.i18n.t("invalid_credentials") ,detail: error});
     }
 }
 
@@ -50,12 +50,12 @@ export const logout = async(req:UserPrincipleRequest, reply:FastifyReply)=>{
     const userId = req.user?.id;
     const sectionId = req.user?.sectionId;
     if (!userId || !sectionId) {
-        return reply.code(401).send({ message: "Unauthorized" });
+        return reply.code(401).send({ message: req.i18n.t("err_unauthorized") });
     }
     //Clear section in redis
     await redis.del(`${userId}:${sectionId}`);
     return reply.send({
-        message: "logout sessions success",
+        message: req.i18n.t("logout_sessions_success"),
         userID: req.user?.id,
         sectionID: req.user?.sectionId,
     }).status(200)
@@ -65,7 +65,7 @@ export const logout = async(req:UserPrincipleRequest, reply:FastifyReply)=>{
 export const logoutAll = async (req: UserPrincipleRequest, reply: FastifyReply) => {
     const userId = req.user?.id;
     if (!userId) {
-        return reply.code(401).send({ message: "Unauthorized" });
+        return reply.code(401).send({ message: req.i18n.t("err_unauthorized") });
     }
 
     let cursor = '0';
@@ -79,7 +79,7 @@ export const logoutAll = async (req: UserPrincipleRequest, reply: FastifyReply) 
     } while (cursor !== '0');
 
     return reply.code(200).send({
-        message: "logout all sessions success",
+        message: req.i18n.t("logout_all_sessions_success"),
         userID: userId,
     });
 };

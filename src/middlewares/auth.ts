@@ -27,7 +27,7 @@ export default async function auth( req:UserPrincipleRequest, reply:FastifyReply
         };
         return; 
     }else{
-        return reply.code(401).send({error: "Unauthorized!"})
+        return reply.code(401).send({error: req.i18n.t('err_unauthorized')})
     }
 }
 

@@ -1,0 +1,20 @@
+{
+  "err_invalid_query_params":"Invalid query parameters",
+  "err_unauthorized":"Unauthorized",
+  "err_internal_server_error":"Internal server error",
+  "err_unauthorized_or_not_found":"Unauthorized or not found",
+  "summary":"Summary",
+  "transaction_created":"Transaction created",
+  "no_file_uploaded":"No file uploaded",
+  "only_image_files_allowed":"Only image files allowed",
+  "transaction_not_found":"Transaction not found or not have permission",
+  "upload_image_success":"Upload image success",
+  "user_not_found":"User not found",
+  "account_created":"account created",
+  "account_deleted_successfully": "Account deleted successfully",
+  "invalid_credentials":"Invalid credentials",
+  "logout_sessions_success":"Logout sessions success",
+  "logout_all_sessions_success":"Logout all sessions success",
+  "category_created":"Category created",
+  "category_deleted_successfully": "Category deleted successfully"
+}

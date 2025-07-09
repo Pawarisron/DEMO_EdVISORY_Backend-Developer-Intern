@@ -1,0 +1,20 @@
+{
+  "err_invalid_query_params":"พารามิเตอร์ที่ส่งมาในการค้นหาไม่ถูกต้อง",
+  "err_unauthorized":"ยังไม่ได้เข้าสู่ระบบหรือไม่มีสิทธิ์ในการเข้าถึงทรัพยากรนี้",
+  "err_internal_server_error":"เซิร์ฟเวอร์เกิดข้อผิดพลาดภายในขณะประมวลผลคำขอ",
+  "err_unauthorized_or_not_found":"ไม่ได้รับอนุญาตหรือไม่พบข้อมูล",
+  "summary":"สรุปรายงาน",
+  "transaction_created":"สร้างรายการสำเร็จ",
+  "no_file_uploaded":"ไม่มีไฟล์ที่ถูกอัปโหลด",
+  "only_image_files_allowed":"อนุญาตให้ใช้เฉพาะไฟล์รูปภาพเท่านั้น",
+  "transaction_not_found":"ไม่พบธุรกรรมดังกล่าว หรือคุณไม่มีสิทธิ์เข้าถึง",
+  "upload_image_success":"การอัปโหลดรูปภาพเสร็จสมบูรณ์",
+  "user_not_found":"ไม่พบผู้ใช้",
+  "account_created":"สร้างบัญชีเรียบร้อยแล้ว",
+  "account_deleted_successfully": "ลบบัญชีเรียบร้อยแล้ว",
+  "invalid_credentials":"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
+  "logout_sessions_success":"ออกจากระบบสำเร็จ",
+  "logout_all_sessions_success":"ออกจากระบบทุกอุปกรณ์เรียบร้อยแล้ว",
+  "category_created":"สร้างประเภทการใช้จ่ายเรียบร้อยแล้ว",
+  "category_deleted_successfully": "ลบหมวดหมู่เรียบร้อยแล้ว"
+}

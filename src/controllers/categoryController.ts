@@ -14,11 +14,11 @@ export const getAllCategoriesByUserId = async (req:UserPrincipleRequest, reply:F
     try{
         const {error, value} = paginationSchema.validate(req.query || null)
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
         //Repo
         const categoryRepo = AppDataSource.getRepository(Category);
@@ -26,7 +26,7 @@ export const getAllCategoriesByUserId = async (req:UserPrincipleRequest, reply:F
         //Find User
         const user = await userRepo.findOneBy({ id: userId });
             if (!user) {
-            return reply.code(400).send({ message: 'User not found'});
+            return reply.code(400).send({ message: req.i18n.t("user_not_found")});
         }
         //get query
         const page = value.page || 1;
@@ -56,7 +56,7 @@ export const getAllCategoriesByUserId = async (req:UserPrincipleRequest, reply:F
 
     }catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
 }
 
@@ -66,11 +66,11 @@ export const createCategoryByUserId = async (req:UserPrincipleRequest, reply:Fas
             //validation
             const {error, value} = createCategoryByUserIdSchema.validate(req.body || null);
             if(error){
-                return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+                return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
             }
             const userId = req.user?.id;
             if(!userId){
-                return reply.code(401).send({ message: 'Unauthorized'});
+                return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
             }
             //Repo
             const categoryRepo = AppDataSource.getRepository(Category);
@@ -78,7 +78,7 @@ export const createCategoryByUserId = async (req:UserPrincipleRequest, reply:Fas
             //Find User
             const user = await userRepo.findOneBy({ id: userId });
              if (!user) {
-                return reply.code(400).send({ message: 'User not found'});
+                return reply.code(400).send({ message: req.i18n.t("user_not_found")});
             }
             //create category
             const category = new Category();
@@ -88,13 +88,13 @@ export const createCategoryByUserId = async (req:UserPrincipleRequest, reply:Fas
     
             //save in db
             await categoryRepo.save(category);
-            return reply.status(201).send({message: "category created",category:category})
+            return reply.status(201).send({message: req.i18n.t("category_created"),category:category})
     
         }
         catch(error){
             req.log.error(error);
             console.error(error); //testing
-            reply.code(500).send({ message: 'Internal Server Error', details: error });
+            reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
         }
 }
 
@@ -103,11 +103,11 @@ export const deleteCategoryById = async (req:UserPrincipleRequest, reply:Fastify
     try{
             const {error, value} = deleteCategoryByIdSchema.validate(req.params || null);
             if(error){
-                return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+                return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
             }
             const userId = req.user?.id;
             if(!userId){
-                return reply.code(401).send({ message: 'Unauthorized'});
+                return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
             }
             //Repo
             const categoryRepo = AppDataSource.getRepository(Category);
@@ -122,15 +122,15 @@ export const deleteCategoryById = async (req:UserPrincipleRequest, reply:Fastify
                 } 
             });
             if (!category) {
-                return reply.status(403).send({ message: 'Unauthorized or not found' });
+                return reply.status(403).send({ message: req.i18n.t("err_unauthorized_or_not_found") });
             }
             //delete category
             await categoryRepo.remove(category);
-            return reply.status(200).send({ message: 'Category deleted successfully' ,id:categoryId });
+            return reply.status(200).send({ message: req.i18n.t("category_deleted_successfully") ,id:categoryId });
         }
         catch(error){
             req.log.error(error);
-            reply.code(500).send({ message: 'Internal Server Error', details: error });
+            reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
         }
 
 }

@@ -17,11 +17,11 @@ export const getAllTransactionByUserId = async (req:UserPrincipleRequest, reply:
     try{
         const {error, value} = getAllTransactionByUserIdSchema.validate(req.query || null)
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
         //repo joined table
         const query = AppDataSource
@@ -85,7 +85,7 @@ export const getAllTransactionByUserId = async (req:UserPrincipleRequest, reply:
 
     }catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
 
 
@@ -97,12 +97,12 @@ export const getTransactionById = async (req:UserPrincipleRequest, reply:Fastify
         //validation
         const {error, value} = getTransactionByIdSchema.validate(req.params || null);
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         //check userId
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
 
         //get single transaction
@@ -112,7 +112,7 @@ export const getTransactionById = async (req:UserPrincipleRequest, reply:Fastify
             user_id:userId,
         } });
         if(!transaction){
-            return reply.status(403).send({ message: 'Unauthorized or not found' });
+            return reply.status(403).send({ message: req.i18n.t("err_unauthorized_or_not_found")});
         }
         return reply.status(200).send({
             status:"success",
@@ -122,7 +122,7 @@ export const getTransactionById = async (req:UserPrincipleRequest, reply:Fastify
     }
     catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
 
 
@@ -134,11 +134,11 @@ export const createTransactionByUserId = async (req:UserPrincipleRequest, reply:
         //Validation
         const {error, value} = createTransactionByUserIdSchema.validate(req.body || null)
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
         //Repo
         const transactionRepo = AppDataSource.getRepository(Transaction);
@@ -158,7 +158,7 @@ export const createTransactionByUserId = async (req:UserPrincipleRequest, reply:
         .limit(1)
         .getRawOne();
         if(!isValid){
-            return reply.status(403).send({ message: 'Unauthorized or not found' });
+            return reply.status(403).send({ message: req.i18n.t("err_unauthorized_or_not_found") });
         }
         //Create Transaction
         const transaction = new Transaction();
@@ -171,11 +171,11 @@ export const createTransactionByUserId = async (req:UserPrincipleRequest, reply:
         
         //save in db
         await transactionRepo.save(transaction);
-        return reply.status(201).send({message: "transaction created",transaction:transaction})
+        return reply.status(201).send({message: req.i18n.t("transaction_created"),transaction:transaction})
 
     }catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
 }
 //Upload Transaction slp
@@ -184,17 +184,17 @@ export const uploadTransactionSlipById = async (req:UserPrincipleRequest, reply:
         //Validation
         const {error, value} = uploadTransactionSlipByIdSchema.validate(req.params || null);
         if(error){
-            return reply.code(400).send({ message: 'Invalid query parameters', details: error.details });
+            return reply.code(400).send({ message: req.i18n.t('err_invalid_query_params'), details: error.details });
         }
         const data = await req.file();
-        if (!data) return reply.status(400).send({ error: 'No file uploaded' });
+        if (!data) return reply.status(400).send({ error: req.i18n.t('no_file_uploaded') });
         //check file type
         if (!data.mimetype.startsWith('image/')) {
-            return reply.status(400).send({ error: 'Only image files allowed' });
+            return reply.status(400).send({ error: req.i18n.t("only_image_files_allowed") });
         }
         const userId = req.user?.id;
         if(!userId){
-            return reply.code(401).send({ message: 'Unauthorized'});
+            return reply.code(401).send({ message: req.i18n.t('err_unauthorized')});
         }
 
         //Repo
@@ -208,7 +208,7 @@ export const uploadTransactionSlipById = async (req:UserPrincipleRequest, reply:
         const result = await transactionRepo.update({id: transactionId, user_id:userId} , {slip_path:newFileName})
         if (result.affected === 0) {
         return reply.status(404).send({
-            message: 'Transaction not found or not have permission',
+            message: req.i18n.t('transaction_not_found'),
         });
         }
 
@@ -220,12 +220,12 @@ export const uploadTransactionSlipById = async (req:UserPrincipleRequest, reply:
         const writeStream = fs.createWriteStream(saveTo);
         await data.file.pipe(writeStream);
         
-        reply.send({message: 'Upload image success', id:transactionId ,filename: newFileName}).code(201);
+        reply.send({message: req.i18n.t("upload_image_success"), id:transactionId ,filename: newFileName}).code(201);
 
     }
     catch(error){
         req.log.error(error);
-        reply.code(500).send({ message: 'Internal Server Error', details: error });
+        reply.code(500).send({ message: req.i18n.t("err_internal_server_error"), details: error });
     }
 }
 
