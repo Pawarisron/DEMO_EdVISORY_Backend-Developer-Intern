@@ -19,7 +19,7 @@ export const config = {
     dbSchema: process.env.DB_SCHEMA,
     dbSync: process.env.DB_SYNC === "true" || false ,
     
-    //Radis
+    //Redis
     redisHost: process.env.REDIS_HOST,
     redisPort: parseInt(process.env.REDIS_PORT || "6379"),
     redisTimeToLive: parseInt(process.env.REDIS_TTL_SECONDS || "900"),
