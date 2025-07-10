@@ -82,6 +82,7 @@ export const getSummaryByUserId = async (req:UserPrincipleRequest, reply:Fastify
                 'user.username',
                 't.note_cleaned'
             ])
+            .orderBy('t.transaction_date', "ASC")
             .getMany();
             const buffer = await exportExcel(transactions, {
                 income: income,
@@ -175,6 +176,11 @@ export const getSummaryAllowanceByUserId = async (req:UserPrincipleRequest, repl
             query.andWhere("category.type = :type",{type: "INCOME"})
         }
 
+        query.andWhere("t.transaction_date BETWEEN :start AND :end", {
+            start: today,
+            end: payday,
+        });
+
         let availablePerDay = 0;
         let sum = 0
         let expense = 0
@@ -217,6 +223,7 @@ export const getSummaryAllowanceByUserId = async (req:UserPrincipleRequest, repl
                 'user.username',
                 't.note_cleaned'
             ])
+            .orderBy('t.transaction_date', "ASC")
             .getMany();
             const buffer = await exportExcel(transactions, {
                 income: income,
