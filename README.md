@@ -329,7 +329,8 @@ POST	/transactions
 
 ```apache
 POST	/transactions/{id}/slip
-# Upload a transaction slip (image) for a specific transaction. The transaction must belong to the authenticated user
+# Upload a transaction slip (image) for a specific transaction.
+# The transaction must belong to the authenticated user
 # Parms
 #     id: The UUID of the transaction to upload a slip for
 # Body
