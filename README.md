@@ -39,19 +39,44 @@ Backend project สำหรับการฝึกงานตำแหน่�
 
 ## Installation
 
+### npm
+
 ```bash
 # Clone project
 git clone https://github.com/Pawarisron/DEMO_EdVISORY_Backend-Developer-Intern.git
-cd demo_edvisory_backend-developer-intern
+cd DEMO_EdVISORY_Backend-Developer-Intern
 
 # Install dependencies
 npm install
 
 # Database Setup
+# Create a PostgreSQL database
+# Execute the database.sql script to set up the schema and mock data
+
 # Redis Setup
+# Install and run Redis server
+
+# Configuration
+# Update the .env file as needed
 
 # Start development server
 npm run dev
+```
+
+### docker-compose
+
+```bash
+# Clone Project
+git clone https://github.com/Pawarisron/DEMO_EdVISORY_Backend-Developer-Intern.git
+cd DEMO_EdVISORY_Backend-Developer-Intern
+
+# Update .env file
+# Before running Docker Compose, update the .env file as follows:
+# DB_HOST=postgres
+# REDIS_HOST=redis
+
+# Using Docker Compose
+docker-compose up --build
 ```
 
 ## Project Structure
