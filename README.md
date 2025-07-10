@@ -72,7 +72,7 @@ src/
 ## API Documentation (Swagger)
 
 ```
-http://localhost:9090/docs
+http://localhost{port}/docs
 ```
 
 ## Database SQL Schema
