@@ -38,9 +38,12 @@ export const getAllTransactionByUserId = async (req:UserPrincipleRequest, reply:
         const accountId = value.accountId;
         const categoryId = value.categoryId;
 
-        //Filter month && year
-        if (month && year) {
+        //Filter month
+        if (month) {
             query.andWhere('EXTRACT( MONTH FROM t.transaction_date ) = :month', { month });
+        }
+        //Filter only year
+        if(year){
             query.andWhere('EXTRACT( YEAR FROM t.transaction_date ) = :year', { year });
         }
         //Filter Type
@@ -72,6 +75,7 @@ export const getAllTransactionByUserId = async (req:UserPrincipleRequest, reply:
             't.transaction_date',
             'category.name',
             'account.name',
+            't.note_cleaned'
         ])
         .getManyAndCount();
         return {
