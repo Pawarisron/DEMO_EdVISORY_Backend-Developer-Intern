@@ -3,7 +3,7 @@ import { FastifyReply } from "fastify";
 import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
 import { getSummaryByUserIdSchema } from "../schemas/summary/getSummaryByUserIdSchema";
 import { AppDataSource } from "../database/dataSource";
-import { config } from "../../config";
+import { config } from "../config/config";
 import { getSummaryAllowanceByUserIdSchema } from "../schemas/summary/getSummaryAllowanceByUserIdSchema";
 import { differenceInCalendarDays } from 'date-fns';
 import ExcelJS from 'exceljs';

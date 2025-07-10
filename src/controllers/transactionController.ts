@@ -8,7 +8,7 @@ import { uploadTransactionSlipByIdSchema } from '../schemas/transactions/uploadT
 import { getAllTransactionByUserIdSchema } from '../schemas/transactions/getAllTransactionByUserIdSchema';
 import path from 'path';
 import fs from 'fs';
-import { config } from '../../config';
+import { config } from '../config/config';
 import { getTransactionByIdSchema } from '../schemas/transactions/getTransactionByIdSchema';
 import ExcelJS from 'exceljs';
 const leoProfanity = require('leo-profanity'); //bad word filter

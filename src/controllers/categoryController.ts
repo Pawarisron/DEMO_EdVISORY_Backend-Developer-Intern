@@ -4,7 +4,7 @@ import { Category } from "../entities/Category";
 import { User } from "../entities/User";
 import { AppDataSource } from "../database/dataSource";
 import { createCategoryByUserIdSchema } from "../schemas/categories/createCategoryByUserIdSchema";
-import { config } from "../../config";
+import { config } from "../config/config";
 import { paginationSchema } from "../schemas/paginationSchema";
 import { deleteCategoryByIdSchema } from "../schemas/categories/deleteCategoryByIdSchema";
 

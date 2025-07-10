@@ -4,7 +4,7 @@ import { AppDataSource } from "../database/dataSource";
 import { Account } from "../entities/Account";
 import { User } from "../entities/User";
 import { paginationSchema } from "../schemas/paginationSchema";
-import { config } from "../../config";
+import { config } from "../config/config";
 import { createAccountByUserIdSchema } from "../schemas/accounts/createAccountByUserIdSchema";
 import { deleteAccountByIdSchema } from "../schemas/accounts/deleteAccountByIdSchema";
 

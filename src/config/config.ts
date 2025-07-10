@@ -21,7 +21,7 @@ export const config = {
     dbSync: process.env.DB_SYNC === "true" || false ,
     
     //Redis
-    redisHost: process.env.REDIS_HOST,
+    redisHost: process.env.REDIS_HOST || "localhost",
     redisPort: parseInt(process.env.REDIS_PORT || "6379"),
     redisTimeToLive: parseInt(process.env.REDIS_TTL_SECONDS || "900"),
 

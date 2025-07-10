@@ -2,7 +2,7 @@ import { User } from '../entities/User';
 import { UserPrincipleRequest, UserPrinciple } from '../types/UserPrincipleRequest';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify';
-import { config } from '../../config';
+import { config } from '../config/config';
 import crypto from "crypto";
 import { redis } from '../database/redis';
 

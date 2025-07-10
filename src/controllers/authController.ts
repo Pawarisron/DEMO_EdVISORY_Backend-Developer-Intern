@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { v4 as uuid4 } from "uuid";
 import crypto from "crypto";
-import { config } from "../../config";
+import { config } from "../config/config";
 import { redis } from "../database/redis";
 import { UserPrincipleRequest } from "../types/UserPrincipleRequest";
 import { User } from "../entities/User";

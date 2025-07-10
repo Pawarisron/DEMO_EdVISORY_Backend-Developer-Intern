@@ -1,6 +1,6 @@
 // schemas/paginationSchema.ts
 import Joi from "joi";
-import { config } from "../../config";
+import { config } from "../config/config";
 
 //Pagination validation
 export const paginationSchema = Joi.object({

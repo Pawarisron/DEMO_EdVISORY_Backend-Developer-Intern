@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  fastify-app:
+    build: .
+    ports:
+      - "7070:7070"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./.env:/app/.env #.env
+    networks:
+      - app-network
+  postgres:
+    image: postgres:15
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-intern-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-intern-data:/data
+    networks:
+      - app-network
+
+volumes:
+  postgres-intern-data:
+  redis-intern-data:
+
+networks:
+  app-network:
+    driver: bridge

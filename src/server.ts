@@ -2,7 +2,7 @@ import Fastify from "fastify"
 import multipart from '@fastify/multipart';
 import swagger from '@fastify/swagger'
 import swaggerUI from '@fastify/swagger-ui'
-import { config } from "../config";
+import { config } from "./config/config";
 import { AppDataSource } from "./database/dataSource";
 import auth from "./middlewares/auth"
 import i18n from 'fastify-i18n';
@@ -53,7 +53,7 @@ fastify.register(require("./routes/summaryRoutes"))
 const start = async () => {
     try {
         await AppDataSource.initialize();
-        await fastify.listen({port: config.port})
+        await fastify.listen({port: config.port, host: '0.0.0.0'})
         console.log(`Server listening on port ${config.port}`);
     } catch (error) {
         console.error(error)

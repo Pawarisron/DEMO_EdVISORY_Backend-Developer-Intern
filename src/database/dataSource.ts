@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { config } from './../../config';
+import { config } from '../config/config';
 import { Account } from "../entities/Account";
 import { User } from "../entities/User";
 import { Category } from "../entities/Category";
