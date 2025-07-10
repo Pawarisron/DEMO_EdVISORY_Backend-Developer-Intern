@@ -9,7 +9,7 @@ import i18n from 'fastify-i18n';
 import path from "path";
 import fs from 'fs'
 
-const fastify = Fastify({logger: false})
+const fastify = Fastify({logger: true})
 
 //register plugin
 fastify.register(multipart);
