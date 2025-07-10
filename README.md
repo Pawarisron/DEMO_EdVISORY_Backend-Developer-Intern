@@ -59,7 +59,7 @@ npm install
 # Configuration
 # Update the .env file as needed
 
-# Start development server
+# Start development server (default port: 7070)
 npm run dev
 ```
 
@@ -75,7 +75,7 @@ cd DEMO_EdVISORY_Backend-Developer-Intern
 # DB_HOST=postgres
 # REDIS_HOST=redis
 
-# Using Docker Compose
+# Using Docker Compose (default port: 7070)
 docker-compose up --build
 ```
 
@@ -329,7 +329,8 @@ POST	/transactions
 
 ```apache
 POST	/transactions/{id}/slip
-# Upload a transaction slip (image) for a specific transaction. The transaction must belong to the authenticated user
+# Upload a transaction slip (image) for a specific transaction.
+# The transaction must belong to the authenticated user
 # Parms
 #     id: The UUID of the transaction to upload a slip for
 # Body
