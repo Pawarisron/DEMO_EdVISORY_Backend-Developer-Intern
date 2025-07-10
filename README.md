@@ -379,6 +379,7 @@ GET	/summary/allowance
 ## Future Development
 
 * Cache All Possible Requests
+* Custom JWT Implementation
 * Password Hashing
 * Refresh Token API
 * Test Coverage
