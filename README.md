@@ -376,6 +376,13 @@ GET	/summary/allowance
 #     format: Optional output format. Only "excel" is valid for export.
 ```
 
+## Future Development
+
+* Cache All Possible Requests
+* Password Hashing
+* Refresh Token API
+* Test Coverage
+
 ## Author
 
 ปวริศร วิทยา
