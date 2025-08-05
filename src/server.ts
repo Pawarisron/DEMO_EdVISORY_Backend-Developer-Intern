@@ -7,6 +7,7 @@ import { AppDataSource } from "./database/dataSource";
 import auth from "./middlewares/auth"
 import i18n from 'fastify-i18n';
 import path from "path";
+import cors from '@fastify/cors';
 import fs from 'fs'
 
 const fastify = Fastify({logger: true})
@@ -14,6 +15,7 @@ const fastify = Fastify({logger: true})
 //register plugin
 fastify.register(multipart);
 fastify.register(swagger)
+
 fastify.register(swaggerUI, {
     routePrefix: config.swaggerPath,
     uiConfig: {
@@ -52,6 +54,12 @@ fastify.register(require("./routes/summaryRoutes"))
 
 const start = async () => {
     try {
+        //CORS
+        await fastify.register(cors, {
+            origin: true,
+            credentials: true,
+        });
+        //DB
         await AppDataSource.initialize();
         await fastify.listen({port: config.port, host: '0.0.0.0'})
         console.log(`Server listening on port ${config.port}`);
